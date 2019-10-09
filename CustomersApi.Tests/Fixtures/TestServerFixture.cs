@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -10,6 +11,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
+using Newtonsoft.Json;
 
 namespace CustomersApi.Tests.Fixtures
 {
@@ -55,6 +58,12 @@ namespace CustomersApi.Tests.Fixtures
         public HttpClient Client { get; }
 
         public IServiceProvider Services { get; }
+
+        public StringContent SerializePayload(object body) =>
+            new StringContent(
+                JsonConvert.SerializeObject(body),
+                Encoding.UTF8,
+                "application/json");
 
         public void Dispose()
         {

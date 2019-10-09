@@ -84,7 +84,7 @@ namespace CustomersApi.Tests.Controllers
         [Test]
         public void Get_ShouldIncludeContacts_WhenSpecifiedInQuery()
         {
-            var response = _testServer.Client.GetAsync($"v1/customers?Name=two&Include=Contacts").Result;
+            var response = _testServer.Client.GetAsync("v1/customers?Name=two&Include=Contacts").Result;
             var body = response.Content.ReadAsStringAsync().Result;
             var customers = JsonConvert.DeserializeObject<List<DtoCustomer>>(body);
 
@@ -99,9 +99,9 @@ namespace CustomersApi.Tests.Controllers
         }
 
         [Test]
-        public void Get_Should_IncludeAddresses_WhenSpecifiedInQuery()
+        public void Get_ShouldIncludeAddresses_WhenSpecifiedInQuery()
         {
-            var response = _testServer.Client.GetAsync($"v1/customers?Name=two&Include=Contacts&Include=Addresses").Result;
+            var response = _testServer.Client.GetAsync("v1/customers?Name=two&Include=Contacts&Include=Addresses").Result;
             var body = response.Content.ReadAsStringAsync().Result;
             var customers = JsonConvert.DeserializeObject<List<DtoCustomer>>(body);
 
@@ -116,6 +116,71 @@ namespace CustomersApi.Tests.Controllers
             customerTwoContact.Addresses.Should().NotBeNull();
             customerTwoContact.Addresses.Should().ContainSingle();
             customerTwoContact.Addresses.Should().ContainSingle(c => c.AddressId == 1);
+        }
+
+        [Test]
+        public void Post_ShouldCreateCustomer_WhenValidInputSupplied()
+        {
+            const string newCustomerName = "Four Corp";
+            var newCustomer = new DtoCustomer { Name = newCustomerName };
+            var content = _testServer.SerializePayload(newCustomer);
+
+            var response = _testServer.Client.PostAsync("v1/customers", content).Result;
+
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            response.Content.Should().NotBeNull();
+
+            var responseBody = JsonConvert.DeserializeObject<DtoCustomer>(response.Content.ReadAsStringAsync().Result);
+
+            responseBody.CustomerId.Should().BeGreaterThan(0);
+            responseBody.IsActive.Should().BeTrue();
+            responseBody.Name.Should().Be(newCustomerName);
+            responseBody.NumberOfOrders.Should().Be(0);
+            responseBody.TotalOrderValue.Should().Be(0M);
+            responseBody.LastOrderDate.Should().Be(default);
+
+            response.Headers.Location.ToString()
+                .Should()
+                .Be($"https://localhost:5001/v1/customers/{responseBody.CustomerId}");
+
+            var record = _customersDataFixture.Context.Customers.SingleOrDefault(c => c.Id == responseBody.CustomerId);
+            record.Should().NotBeNull();
+        }
+
+        [TestCase(default(string))]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void Post_ShouldReturnBadRequest_WhenInvalidInputSupplied(string badName)
+        {
+            var newCustomer = new DtoCustomer { Name = badName };
+            var content = _testServer.SerializePayload(newCustomer);
+
+            var response = _testServer.Client.PostAsync("v1/customers", content).Result;
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            response.Content.Should().NotBeNull();
+
+            var validationMessage = JsonConvert.DeserializeAnonymousType(
+                response.Content.ReadAsStringAsync().Result,
+                new { Errors = new Dictionary<string, IEnumerable<string>>() });
+
+            validationMessage.Errors.Should()
+                .ContainKey(nameof(DtoCustomer.Name))
+                .WhichValue.Should()
+                .ContainSingle("Name must have a value.");
+        }
+
+        [Test]
+        public void Delete_ShouldRemoveRecordAndReturnNoContent_WhenValidIdSupplied()
+        {
+            const long customerId = 1;
+
+            var response = _testServer.Client.DeleteAsync($"v1/customers/{customerId}").Result;
+
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            var record = _customersDataFixture.Context.Customers.SingleOrDefault(c => c.Id == 1);
+            record.Should().BeNull();
         }
 
         private void BuildTestContainerBuilder(ContainerBuilder builder)
