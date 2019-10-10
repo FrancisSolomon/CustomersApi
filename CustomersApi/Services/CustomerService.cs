@@ -26,9 +26,9 @@ namespace CustomersApi.Services
 
         private readonly ILogger<CustomerService> _logger;
 
-        private readonly IValidator<DtoCustomer> _customerValidator;
+        private readonly IValidator<CustomerDto> _customerValidator;
 
-        public CustomerService(CustomerDbContext context, IMapper mapper, ILogger<CustomerService> logger, IValidator<DtoCustomer> customerValidator)
+        public CustomerService(CustomerDbContext context, IMapper mapper, ILogger<CustomerService> logger, IValidator<CustomerDto> customerValidator)
         {
             _context = context;
             _mapper = mapper;
@@ -36,14 +36,14 @@ namespace CustomersApi.Services
             _customerValidator = customerValidator;
         }
 
-        public async Task<DtoCustomer> GetByIdAsync(long id)
+        public async Task<CustomerDto> GetByIdAsync(long id)
         {
             var result = await _context.Customers.FindAsync(id);
 
-            return _mapper.Map<DtoCustomer>(result);
+            return _mapper.Map<CustomerDto>(result);
         }
 
-        public async Task<List<DtoCustomer>> GetAsync(CustomerFilter filter)
+        public async Task<List<CustomerDto>> GetAsync(CustomerFilter filter)
         {
             var predicate = PredicateBuilder.New<Customer>(true);
 
@@ -80,17 +80,17 @@ namespace CustomersApi.Services
 
             var results = await query.ToListAsync();
 
-            return _mapper.Map<List<DtoCustomer>>(results);
+            return _mapper.Map<List<CustomerDto>>(results);
         }
 
-        public async Task<DtoCustomer> PostAsync(DtoCustomer dtoCustomer)
+        public async Task<CustomerDto> PostAsync(CustomerDto customerDto)
         {
-            await _customerValidator.ValidateAndThrowAsync(dtoCustomer);
-            var customer = _mapper.Map<Customer>(dtoCustomer);
+            await _customerValidator.ValidateAndThrowAsync(customerDto);
+            var customer = _mapper.Map<Customer>(customerDto);
             var updatedCustomer = await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<DtoCustomer>(updatedCustomer.Entity);
+            return _mapper.Map<CustomerDto>(updatedCustomer.Entity);
         }
 
         public async Task DeleteAsync(long id)

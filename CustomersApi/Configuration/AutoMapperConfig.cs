@@ -16,21 +16,21 @@ namespace CustomersApi.Configuration
 
         private void MapCustomer()
         {
-            CreateMap<Customer, DtoCustomer>()
+            CreateMap<Customer, CustomerDto>()
                 .ForMember(d => d.CustomerId, s => s.MapFrom(src => src.Id))
                 .ReverseMap();
         }
 
         private void MapContact()
         {
-            CreateMap<Contact, DtoContact>()
+            CreateMap<Contact, ContactDto>()
                 .ForMember(d => d.ContactId, s => s.MapFrom(src => src.Id))
                 .ReverseMap();
         }
 
         private void MapAddress()
         {
-            CreateMap<Address, DtoAddress>()
+            CreateMap<Address, AddressDto>()
                 .ForMember(d => d.AddressId, s => s.MapFrom(src => src.Id))
                 .ReverseMap();
         }

@@ -8,11 +8,11 @@ namespace CustomersApi.Services
 {
     public interface ICustomerService
     {
-        Task<DtoCustomer> GetByIdAsync(long id);
+        Task<CustomerDto> GetByIdAsync(long id);
 
-        Task<List<DtoCustomer>> GetAsync(CustomerFilter filter);
+        Task<List<CustomerDto>> GetAsync(CustomerFilter filter);
 
-        Task<DtoCustomer> PostAsync(DtoCustomer customer);
+        Task<CustomerDto> PostAsync(CustomerDto customer);
 
         Task DeleteAsync(long id);
     }

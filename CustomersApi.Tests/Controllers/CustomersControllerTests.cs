@@ -45,7 +45,7 @@ namespace CustomersApi.Tests.Controllers
 
             var response = _testServer.Client.GetAsync($"v1/customers/{customerId}").Result;
             var body = response.Content.ReadAsStringAsync().Result;
-            var customer = JsonConvert.DeserializeObject<DtoCustomer>(body);
+            var customer = JsonConvert.DeserializeObject<CustomerDto>(body);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             customer.CustomerId.Should().Be(expectedCustomer.Id);
@@ -72,7 +72,7 @@ namespace CustomersApi.Tests.Controllers
         {
             var response = _testServer.Client.GetAsync($"/v1/customers?{urlFilter}").Result;
             var body = response.Content.ReadAsStringAsync().Result;
-            var customers = JsonConvert.DeserializeObject<List<DtoCustomer>>(body);
+            var customers = JsonConvert.DeserializeObject<List<CustomerDto>>(body);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             customers.Select(i => i.CustomerId)
@@ -86,7 +86,7 @@ namespace CustomersApi.Tests.Controllers
         {
             var response = _testServer.Client.GetAsync("v1/customers?Name=two&Include=Contacts").Result;
             var body = response.Content.ReadAsStringAsync().Result;
-            var customers = JsonConvert.DeserializeObject<List<DtoCustomer>>(body);
+            var customers = JsonConvert.DeserializeObject<List<CustomerDto>>(body);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             customers.Should().ContainSingle();
@@ -103,7 +103,7 @@ namespace CustomersApi.Tests.Controllers
         {
             var response = _testServer.Client.GetAsync("v1/customers?Name=two&Include=Contacts&Include=Addresses").Result;
             var body = response.Content.ReadAsStringAsync().Result;
-            var customers = JsonConvert.DeserializeObject<List<DtoCustomer>>(body);
+            var customers = JsonConvert.DeserializeObject<List<CustomerDto>>(body);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             customers.Should().ContainSingle();
@@ -122,7 +122,7 @@ namespace CustomersApi.Tests.Controllers
         public void Post_ShouldCreateCustomer_WhenValidInputSupplied()
         {
             const string newCustomerName = "Four Corp";
-            var newCustomer = new DtoCustomer { Name = newCustomerName };
+            var newCustomer = new CustomerDto { Name = newCustomerName };
             var content = _testServer.SerializePayload(newCustomer);
 
             var response = _testServer.Client.PostAsync("v1/customers", content).Result;
@@ -130,7 +130,7 @@ namespace CustomersApi.Tests.Controllers
             response.StatusCode.Should().Be(HttpStatusCode.Created);
             response.Content.Should().NotBeNull();
 
-            var responseBody = JsonConvert.DeserializeObject<DtoCustomer>(response.Content.ReadAsStringAsync().Result);
+            var responseBody = JsonConvert.DeserializeObject<CustomerDto>(response.Content.ReadAsStringAsync().Result);
 
             responseBody.CustomerId.Should().BeGreaterThan(0);
             responseBody.IsActive.Should().BeTrue();
@@ -152,7 +152,7 @@ namespace CustomersApi.Tests.Controllers
         [TestCase("   ")]
         public void Post_ShouldReturnBadRequest_WhenInvalidInputSupplied(string badName)
         {
-            var newCustomer = new DtoCustomer { Name = badName };
+            var newCustomer = new CustomerDto { Name = badName };
             var content = _testServer.SerializePayload(newCustomer);
 
             var response = _testServer.Client.PostAsync("v1/customers", content).Result;
@@ -165,7 +165,7 @@ namespace CustomersApi.Tests.Controllers
                 new { Errors = new Dictionary<string, IEnumerable<string>>() });
 
             validationMessage.Errors.Should()
-                .ContainKey(nameof(DtoCustomer.Name))
+                .ContainKey(nameof(CustomerDto.Name))
                 .WhichValue.Should()
                 .ContainSingle("Name must have a value.");
         }

@@ -46,7 +46,7 @@ namespace CustomersApi.V1.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(Customer), 201)]
-        public async Task<IActionResult> PostAsync([FromBody]DtoCustomer customer)
+        public async Task<IActionResult> PostAsync([FromBody]CustomerDto customer)
         {
             var result = await _customerService.PostAsync(customer);
 

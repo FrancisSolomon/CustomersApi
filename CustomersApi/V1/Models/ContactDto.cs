@@ -2,7 +2,7 @@
 
 namespace CustomersApi.V1.Models
 {
-    public class DtoContact
+    public class ContactDto
     {
         public long ContactId { get; set; }
 
@@ -12,6 +12,6 @@ namespace CustomersApi.V1.Models
 
         public string ContactType { get; set; }
 
-        public List<DtoAddress> Addresses { get; set; }
+        public List<AddressDto> Addresses { get; set; }
     }
 }

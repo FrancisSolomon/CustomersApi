@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CustomersApi.V1.Models
 {
-    public class DtoCustomer
+    public class CustomerDto
     {
         public long CustomerId { get; set; }
 
@@ -17,6 +17,6 @@ namespace CustomersApi.V1.Models
 
         public long NumberOfOrders { get; set; }
 
-        public List<DtoContact> Contacts { get; set; }
+        public List<ContactDto> Contacts { get; set; }
     }
 }

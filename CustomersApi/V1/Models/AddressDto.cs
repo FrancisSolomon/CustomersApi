@@ -1,6 +1,6 @@
 ﻿namespace CustomersApi.V1.Models
 {
-    public class DtoAddress
+    public class AddressDto
     {
         public long AddressId { get; set; }
 

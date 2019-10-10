@@ -6,7 +6,7 @@ using FluentValidation;
 
 namespace CustomersApi.Validators
 {
-    public class CustomerValidator : AbstractValidator<DtoCustomer>
+    public class CustomerValidator : AbstractValidator<CustomerDto>
     {
         public CustomerValidator()
         {
